@@ -1,0 +1,26 @@
+/* STREAMING_CHUNK:Configuring Tailwind CSS base directives... */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* STREAMING_CHUNK:Styling root body and font settings... */
+body {
+font-family: 'Inter', sans-serif;
+background-color: #020617;
+color: #f8fafc;
+}
+
+/* STREAMING_CHUNK:Defining audio wave animation keyframes... */
+.audio-wave {
+animation: pulse-wave 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-wave {
+0%, 100% { transform: scaleY(0.4); }
+50% { transform: scaleY(1); }
+}
+
+/* STREAMING_CHUNK:Defining custom glow shadows... */
+.glow-blue {
+box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
+}
