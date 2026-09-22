@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Deepfake Akademija — izobraževalna platforma SRC za prepoznavanje deepfake napadov: moduli s kvizom, analizator artefaktov (EXIF+ELA, lokalno), scenarijski trenažer in certifikat. Brez generiranja pravih ponaredkov.">
+<meta name="description" content="Deepfake Akademija — izobraževalna platforma SRC za prepoznavanje deepfake napadov z vodenim ogledom: moduli s kvizom, analizator (EXIF+ELA, lokalno), scenarijski trenažer in certifikat. Brez generiranja pravih ponaredkov.">
 <meta name="author" content="SRC · SOC Awareness">
 <meta name="theme-color" content="#0b0e14">
 <style>
@@ -147,9 +147,12 @@
     letter-spacing: 0.02em;
   }
 
-  .theme-btn {
+  .head-actions {
     position: absolute; top: 18px; right: 20px;
-    z-index: 3;
+    z-index: 4;
+    display: flex; gap: 8px;
+  }
+  .theme-btn {
     background: var(--surface-2);
     border: 1px solid var(--border);
     color: var(--text-dim);
@@ -162,6 +165,8 @@
     display: inline-flex; align-items: center; gap: 6px;
   }
   .theme-btn:hover { border-color: var(--border-bright); color: var(--text); }
+  #tourBtn { border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); }
+  #tourBtn:hover { border-color: var(--accent); }
 
   /* ---------- Progress bar ---------- */
   .progress-strip {
@@ -834,15 +839,131 @@
     color: var(--text-faint); text-transform: uppercase;
   }
 
+  /* ==================== VODENJE / ONBOARDING ==================== */
+  /* Pozdravni modal */
+  .ob-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(5,8,13,0.72);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .ob-overlay.show { display: flex; animation: fade .3s; }
+  .ob-modal {
+    background: var(--surface); border: 1px solid var(--border-bright);
+    border-radius: 18px; max-width: 460px; width: 100%;
+    padding: 30px 30px 26px; box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+    position: relative; text-align: center;
+  }
+  .ob-modal .ob-badge {
+    width: 56px; height: 56px; border-radius: 15px;
+    background: linear-gradient(160deg, var(--accent), var(--safe));
+    display: grid; place-items: center; margin: 0 auto 16px;
+    font-size: 26px;
+  }
+  .ob-modal h3 { font-family: var(--display); font-weight: 700; font-size: 22px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .ob-modal p { color: var(--text-dim); font-size: 14.5px; margin: 0 auto 18px; max-width: 40ch; }
+  .ob-steps { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
+  .ob-chip {
+    font-family: var(--mono); font-size: 11px; color: var(--text-dim);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 11px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .ob-chip b { color: var(--accent); }
+  .ob-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* Spotlight tour */
+  .tour-backdrop {
+    position: fixed; inset: 0; z-index: 1100;
+    display: none; pointer-events: none;
+  }
+  .tour-backdrop.show { display: block; }
+  .tour-hole {
+    position: absolute; border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(5,8,13,0.74);
+    border: 2px solid var(--accent);
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+  .tour-pop {
+    position: absolute; z-index: 1101;
+    background: var(--surface); border: 1px solid var(--border-bright);
+    border-radius: 14px; padding: 17px 18px; width: min(320px, calc(100vw - 32px));
+    box-shadow: 0 16px 50px rgba(0,0,0,0.5);
+    pointer-events: auto;
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+  }
+  .tour-pop .tp-step { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  .tour-pop h4 { font-family: var(--display); font-weight: 700; font-size: 16px; margin: 0 0 6px; }
+  .tour-pop p { font-size: 13.5px; color: var(--text-dim); margin: 0 0 14px; line-height: 1.5; max-width: none; }
+  .tour-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tour-dots { display: flex; gap: 5px; }
+  .tour-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--surface-3); display: block; }
+  .tour-dots i.on { background: var(--accent); }
+  .tour-nav-btns { display: flex; gap: 8px; }
+  .tour-btn {
+    font-family: var(--display); font-weight: 600; font-size: 13px;
+    padding: 7px 14px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--border-bright); background: var(--surface-2); color: var(--text);
+  }
+  .tour-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tour-btn.ghost { border: none; background: none; color: var(--text-faint); padding: 7px 6px; }
+  .tour-pop .tp-arrow {
+    position: absolute; width: 14px; height: 14px;
+    background: var(--surface); border: 1px solid var(--border-bright);
+    transform: rotate(45deg);
+  }
+
+  /* Coach namigi */
+  .coach {
+    position: absolute; z-index: 60;
+    background: var(--accent); color: #fff;
+    font-family: var(--body); font-size: 12.5px; font-weight: 500;
+    padding: 8px 13px; border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    display: inline-flex; align-items: center; gap: 9px;
+    max-width: 280px; animation: coachIn .4s cubic-bezier(.4,0,.2,1);
+  }
+  .coach::after {
+    content: ""; position: absolute; width: 12px; height: 12px;
+    background: var(--accent); transform: rotate(45deg);
+  }
+  .coach.arrow-up::after { top: -5px; left: 22px; }
+  .coach.arrow-down::after { bottom: -5px; left: 22px; }
+  .coach .coach-x { cursor: pointer; opacity: 0.8; font-size: 15px; line-height: 1; }
+  .coach .coach-x:hover { opacity: 1; }
+  @keyframes coachIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* Next-step namig po zaključku */
+  .next-hint {
+    margin-top: 16px; display: flex; align-items: center; gap: 12px;
+    background: var(--accent-bg); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 12px; padding: 13px 16px;
+    animation: fade .4s;
+  }
+  .next-hint .nh-txt { font-size: 13.5px; color: var(--text-dim); }
+  .next-hint .nh-txt b { color: var(--text); font-family: var(--display); }
+  .next-hint button {
+    margin-left: auto; font-family: var(--display); font-weight: 600; font-size: 13px;
+    background: var(--accent); border: none; color: #fff;
+    padding: 9px 16px; border-radius: 9px; cursor: pointer; white-space: nowrap;
+  }
+  .next-hint button:hover { filter: brightness(1.08); }
+
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
   }
 </style>
 
 <header class="site">
-  <button class="theme-btn" id="themeToggle" aria-label="Preklopi temo">
-    <span id="themeIcon">◐</span> <span id="themeText">Tema</span>
-  </button>
+  <div class="head-actions">
+    <button class="theme-btn" id="tourBtn" aria-label="Zaženi voden ogled" title="Voden ogled">
+      <span aria-hidden="true">🧭</span> <span>Ogled</span>
+    </button>
+    <button class="theme-btn" id="themeToggle" aria-label="Preklopi temo">
+      <span id="themeIcon">◐</span> <span id="themeText">Tema</span>
+    </button>
+  </div>
   <div class="wrap head-inner">
     <div class="brand-row">
       <img class="brand-logo dark" alt="SRC" src="data:image/png;base64,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">
@@ -857,7 +978,7 @@
   </div>
 </header>
 
-<div class="progress-strip">
+<div class="progress-strip" id="progressStrip">
   <div class="wrap progress-inner">
     <span class="prog-label">Napredek: <b id="progNum">0</b> / 3 modulov zaključenih</span>
     <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
@@ -865,7 +986,7 @@
 </div>
 
 <div class="wrap">
-  <div class="tabs" role="tablist">
+  <div class="tabs" role="tablist" id="tabsRow">
     <button class="tab" role="tab" aria-selected="true" data-mod="0">
       <span class="tnum">MODUL 01</span>
       <span class="tname"><span class="ticon" aria-hidden="true">🎙️</span> Glasovni klon</span>
@@ -1179,6 +1300,44 @@
   </div>
 
 </main>
+
+<!-- Pozdravni modal -->
+<div class="ob-overlay" id="obOverlay" role="dialog" aria-modal="true" aria-labelledby="obTitle">
+  <div class="ob-modal">
+    <div class="ob-badge" aria-hidden="true">🛡️</div>
+    <h3 id="obTitle">Dobrodošli v Deepfake Akademiji</h3>
+    <p>V nekaj minutah se naučite prepoznati ponarejen glas, obraz in e-pošto — ter kaj storiti, ko na to naletite.</p>
+    <div class="ob-steps">
+      <span class="ob-chip"><b>3</b> lekcije</span>
+      <span class="ob-chip"><b>1</b> orodje</span>
+      <span class="ob-chip"><b>1</b> vaja</span>
+      <span class="ob-chip">🎓 certifikat</span>
+    </div>
+    <div class="ob-actions">
+      <button class="btn primary" id="obStart">Popelji me skozi →</button>
+      <button class="btn" id="obSkip">Preskoči</button>
+    </div>
+  </div>
+</div>
+
+<!-- Spotlight tour -->
+<div class="tour-backdrop" id="tourBackdrop" aria-hidden="true">
+  <div class="tour-hole" id="tourHole"></div>
+</div>
+<div class="tour-pop" id="tourPop" role="dialog" aria-live="polite" hidden>
+  <div class="tp-arrow" id="tpArrow"></div>
+  <div class="tp-step" id="tpStep"></div>
+  <h4 id="tpTitle"></h4>
+  <p id="tpText"></p>
+  <div class="tour-nav">
+    <div class="tour-dots" id="tpDots"></div>
+    <div class="tour-nav-btns">
+      <button class="tour-btn ghost" id="tpSkip">Zapri</button>
+      <button class="tour-btn" id="tpPrev">← Nazaj</button>
+      <button class="tour-btn primary" id="tpNext">Naprej →</button>
+    </div>
+  </div>
+</div>
 
 <footer class="site">
   <div class="wrap foot-inner">
@@ -1504,6 +1663,7 @@
         markComplete(modIndex);
       }
       updateProgress();
+      if (window.__akOnQuizDone) window.__akOnQuizDone(modIndex);
     }
 
     draw();
@@ -2207,6 +2367,202 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+
+  /* ==================================================================
+     VODENJE / ONBOARDING — pozdravni modal, spotlight tour,
+     kontekstualni namigi, vodenje med moduli
+     ================================================================== */
+  var LS_SEEN = 'dfa_tour_seen_v1';
+  var LS_COACH = 'dfa_coach_seen_v1';
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* ---------- Pomožno: preklop na zavihek ---------- */
+  function goToTab(idx) {
+    var t = document.querySelector('.tab[data-mod="' + idx + '"]');
+    if (t) t.click();
+  }
+  function currentTabIdx() {
+    var sel = document.querySelector('.tab[aria-selected="true"]');
+    return sel ? parseInt(sel.getAttribute('data-mod'), 10) : 0;
+  }
+
+  /* ---------- SPOTLIGHT TOUR ---------- */
+  var TOUR = [
+    { sel: '#tabsRow', tab: 0, title: 'Pet korakov do cilja', text: 'Platforma ima tri lekcije, forenzično orodje in vajo. Do njih dostopate prek teh zavihkov — začnite levo z Modulom 01.', pos: 'bottom' },
+    { sel: '#progressStrip', title: 'Vaš napredek', text: 'Ta trak sledi, koliko lekcij ste zaključili. Cilj so vsi trije kvizi in vaja — potem se odklene certifikat.', pos: 'bottom' },
+    { sel: '.tab[data-mod="0"]', tab: 0, title: 'Lekcija po korakih', text: 'Vsaka lekcija ima isto zgradbo: primer napada → opozorilni znaki → obramba → kratek kviz za preverjanje.', pos: 'bottom' },
+    { sel: '.tab[data-mod="3"]', title: 'Analizator artefaktov', text: 'Forenzično orodje: naložite osumljeno sliko ali video. Datoteka ostane v vašem brskalniku — nič se ne pošlje.', pos: 'bottom' },
+    { sel: '.tab[data-mod="4"]', title: 'Scenarijski trenažer', text: 'Vaja odločanja: ste tarča napada in izbirate odzive. Sistem oceni vsako odločitev.', pos: 'bottom' },
+    { sel: '.tab[data-mod="5"]', title: 'Pripravljenost + certifikat', text: 'Tu vidite vse rezultate in — ko zaključite — generirate potrdilo o usposabljanju za tisk.', pos: 'bottom' },
+    { sel: '#tourBtn', title: 'Ogled kadarkoli', text: 'Ta voden ogled lahko znova zaženete kadarkoli s tem gumbom. Zdaj pa — srečno, in ne nasedite prevari!', pos: 'bottom' }
+  ];
+
+  var backdrop = document.getElementById('tourBackdrop');
+  var hole = document.getElementById('tourHole');
+  var pop = document.getElementById('tourPop');
+  var tpArrow = document.getElementById('tpArrow');
+  var tourIdx = 0, tourActive = false;
+
+  function positionTour() {
+    var step = TOUR[tourIdx];
+    var el = document.querySelector(step.sel);
+    if (!el) { nextTour(); return; }
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // po scrollu izračunaj pozicijo
+    setTimeout(function () {
+      var r = el.getBoundingClientRect();
+      var pad = 6;
+      hole.style.left = (r.left - pad) + 'px';
+      hole.style.top = (r.top - pad) + 'px';
+      hole.style.width = (r.width + pad * 2) + 'px';
+      hole.style.height = (r.height + pad * 2) + 'px';
+
+      // vsebina
+      document.getElementById('tpStep').textContent = 'Korak ' + (tourIdx + 1) + ' / ' + TOUR.length;
+      document.getElementById('tpTitle').textContent = step.title;
+      document.getElementById('tpText').textContent = step.text;
+      var dots = '';
+      for (var i = 0; i < TOUR.length; i++) dots += '<i class="' + (i === tourIdx ? 'on' : '') + '"></i>';
+      document.getElementById('tpDots').innerHTML = dots;
+      document.getElementById('tpPrev').style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
+      document.getElementById('tpNext').textContent = tourIdx === TOUR.length - 1 ? 'Končaj ✓' : 'Naprej →';
+
+      pop.hidden = false;
+      // pozicioniraj pop pod (ali nad) luknjo
+      var pr = pop.getBoundingClientRect();
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var top, left, below = true;
+      if (r.bottom + pr.height + 16 < vh) { top = r.bottom + 12; below = true; }
+      else { top = r.top - pr.height - 12; below = false; }
+      left = Math.min(Math.max(12, r.left + r.width / 2 - pr.width / 2), vw - pr.width - 12);
+      pop.style.top = top + 'px';
+      pop.style.left = left + 'px';
+      // puščica
+      var arrowLeft = Math.min(Math.max(14, r.left + r.width / 2 - left - 7), pr.width - 28);
+      tpArrow.style.left = arrowLeft + 'px';
+      if (below) { tpArrow.style.top = '-8px'; tpArrow.style.bottom = ''; tpArrow.style.borderRight = 'none'; tpArrow.style.borderBottom = 'none'; }
+      else { tpArrow.style.bottom = '-8px'; tpArrow.style.top = ''; tpArrow.style.borderLeft = 'none'; tpArrow.style.borderTop = 'none'; }
+    }, 260);
+  }
+
+  function startTour() {
+    tourIdx = 0; tourActive = true;
+    goToTab(0);
+    backdrop.classList.add('show');
+    setTimeout(positionTour, 120);
+  }
+  function nextTour() {
+    if (tourIdx < TOUR.length - 1) {
+      tourIdx++;
+      if (TOUR[tourIdx].tab !== undefined) goToTab(TOUR[tourIdx].tab);
+      positionTour();
+    } else { endTour(); }
+  }
+  function prevTour() {
+    if (tourIdx > 0) { tourIdx--; positionTour(); }
+  }
+  function endTour() {
+    tourActive = false;
+    backdrop.classList.remove('show');
+    pop.hidden = true;
+    lsSet(LS_SEEN, '1');
+  }
+
+  document.getElementById('tpNext').addEventListener('click', nextTour);
+  document.getElementById('tpPrev').addEventListener('click', prevTour);
+  document.getElementById('tpSkip').addEventListener('click', endTour);
+  document.getElementById('tourBtn').addEventListener('click', startTour);
+  window.addEventListener('resize', function () { if (tourActive) positionTour(); });
+  document.addEventListener('keydown', function (e) {
+    if (!tourActive) return;
+    if (e.key === 'Escape') endTour();
+    else if (e.key === 'ArrowRight') nextTour();
+    else if (e.key === 'ArrowLeft') prevTour();
+  });
+
+  /* ---------- POZDRAVNI MODAL ---------- */
+  var obOverlay = document.getElementById('obOverlay');
+  document.getElementById('obStart').addEventListener('click', function () {
+    obOverlay.classList.remove('show');
+    startTour();
+  });
+  document.getElementById('obSkip').addEventListener('click', function () {
+    obOverlay.classList.remove('show');
+    lsSet(LS_SEEN, '1');
+  });
+
+  // Samodejni zagon ob prvem obisku
+  if (!lsGet(LS_SEEN)) {
+    setTimeout(function () { obOverlay.classList.add('show'); }, 600);
+  }
+
+  /* ---------- KONTEKSTUALNI NAMIGI (coach) ---------- */
+  var coachSeen = {};
+  try { coachSeen = JSON.parse(lsGet(LS_COACH) || '{}'); } catch (e) { coachSeen = {}; }
+  function saveCoach() { lsSet(LS_COACH, JSON.stringify(coachSeen)); }
+
+  function showCoach(key, targetSel, text, arrow) {
+    if (coachSeen[key] || tourActive) return;
+    var target = document.querySelector(targetSel);
+    if (!target || target.offsetParent === null) return;
+    coachSeen[key] = 1; saveCoach();
+    var c = document.createElement('div');
+    c.className = 'coach ' + (arrow === 'down' ? 'arrow-down' : 'arrow-up');
+    c.innerHTML = '<span>' + text + '</span><span class="coach-x" aria-label="Zapri">×</span>';
+    document.body.appendChild(c);
+    var r = target.getBoundingClientRect();
+    var cr = c.getBoundingClientRect();
+    var top = arrow === 'down' ? (window.scrollY + r.top - cr.height - 10) : (window.scrollY + r.bottom + 10);
+    var left = window.scrollX + r.left;
+    left = Math.min(left, window.innerWidth - cr.width - 12);
+    c.style.top = top + 'px';
+    c.style.left = Math.max(12, left) + 'px';
+    var remove = function () { if (c.parentNode) c.parentNode.removeChild(c); };
+    c.querySelector('.coach-x').addEventListener('click', remove);
+    setTimeout(remove, 9000);
+  }
+
+  // sprožitve coach namigov ob odprtju posameznih zavihkov
+  function coachForTab(idx) {
+    if (idx === 2) {
+      // lažna e-pošta — klikni rdeče dele
+      setTimeout(function () { showCoach('email', '#panel-2 .flagword', 'Namig: kliknite rdeče označene dele in razkrijte, zakaj so sumljivi.', 'up'); }, 400);
+    } else if (idx === 3) {
+      setTimeout(function () { showCoach('drop', '#dropzone', 'Namig: povlecite sliko sem ali kliknite za izbiro — datoteka ostane pri vas.', 'up'); }, 400);
+    } else if (idx === 1) {
+      setTimeout(function () { showCoach('pins', '#panel-1 .artifact-pin', 'Namig: kliknite označene točke A/B/C na obrazu.', 'up'); }, 400);
+    }
+  }
+
+  /* ---------- VODENJE MED MODULI (next-step po kvizu) ---------- */
+  // Pokaži namig za naslednji korak, ko je kviz zaključen.
+  var NEXT_MAP = {
+    0: { idx: 1, label: 'Modul 02 · Video maskiranje' },
+    1: { idx: 2, label: 'Modul 03 · Lažna e-pošta' },
+    2: { idx: 4, label: 'Vaja 05 · Scenarijski trenažer' }
+  };
+  window.__akOnQuizDone = function (modIndex) {
+    var container = document.getElementById('quiz-' + modIndex);
+    if (!container || !NEXT_MAP[modIndex]) return;
+    if (container.querySelector('.next-hint')) return;
+    var nx = NEXT_MAP[modIndex];
+    var hint = document.createElement('div');
+    hint.className = 'next-hint';
+    hint.innerHTML = '<span class="nh-txt">Lekcija zaključena. Nadaljujte z <b>' + nx.label + '</b></span>' +
+      '<button>Naprej →</button>';
+    container.appendChild(hint);
+    hint.querySelector('button').addEventListener('click', function () { goToTab(nx.idx); });
+  };
+
+  // poveži coach na obstoječi tab-switch (dodatni listener)
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var idx = parseInt(tab.getAttribute('data-mod'), 10);
+      coachForTab(idx);
+    });
+  });
 
 })();
 </script>
