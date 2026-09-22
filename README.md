@@ -43,12 +43,18 @@ Poleg treh učnih modulov sta na voljo še dve praktični orodji:
 
 | # | Orodje | Vsebina |
 |---|--------|---------|
-| 04 | 🔬 **Analizator artefaktov** | Uporabnik naloži **osumljen** medij (sliko/video), ki **ostane lokalno v brskalniku** — nič se ne pošlje na strežnik. Orodje prebere razpoložljive metapodatke in dimenzije ter vodi skozi forenzično kontrolno listo z oceno tveganja. |
-| 05 | 🎯 **Scenarijski trenažer** | Razvejane odločitvene vaje: uporabnik igra tarčo (klic, e-pošta, video-klic), izbira odzive, sistem ocenjuje odločitve in pokaže posledice. |
+| 04 | 🔬 **Analizator artefaktov** | Uporabnik naloži **osumljen** medij (sliko/video), ki **ostane lokalno v brskalniku**. Prebere EXIF metapodatke, izriše **Error Level Analysis (ELA)** in vodi skozi forenzično kontrolno listo z oceno tveganja. |
+| 05 | 🎯 **Scenarijski trenažer** | 7 razvejanih scenarijev: klic (kloniran glas), BEC e-pošta, deepfake video-klic, SMS smishing, QR quishing, lažni IT support, MFA fatigue. Sistem ocenjuje odzive. |
+| 06 | 📊 **Pripravljenost + certifikat** | Nadzorna plošča z rezultati vseh modulov in vaje, skupno oceno pripravljenosti (Odporen / Previden / Ranljiv) ter generiranjem **potrdila o usposabljanju** za tisk/PDF. |
 
 ### O analizatorju — kaj (ni)
 
-Analizator **ni** detektor deepfaka z gumbom. Brskalnik ne more zanesljivo zaznati ponaredka; orodje je disciplinirana kontrolna lista, kot jo uporablja analitik, plus tehnični podatki, ki jih brskalnik lahko prebere (velikost, tip, ločljivost, čas spremembe). Ocena tveganja je zgolj vsota uporabnikovih opažanj in namenoma ne obljublja lažne gotovosti. Naložena datoteka se obdela lokalno prek `URL.createObjectURL` in se nikamor ne naloži.
+Analizator **ni** detektor deepfaka z gumbom. Brskalnik ne more zanesljivo zaznati ponaredka; orodje je disciplinirana kontrolna lista, kot jo uporablja analitik, plus tehnični podatki. Vgrajena sta:
+
+- **EXIF branje** — minimalen parser prebere APP1/TIFF strukturo JPEG-a (proizvajalec, model, programska oprema, čas zajema …) in označi, če metapodatki namigujejo na urejanje/generiranje. Vse brez zunanjih knjižnic.
+- **ELA (Error Level Analysis)** — slika se prek `<canvas>` ponovno stisne v JPEG in razlika se ojačano prikaže; naknadno urejena območja pogosto izstopajo. Nastavljivo ojačanje in kakovost re-kompresije.
+
+Ocena tveganja je zgolj vsota uporabnikovih opažanj in namenoma ne obljublja lažne gotovosti. Naložena datoteka se obdela lokalno prek `URL.createObjectURL` in se nikamor ne naloži.
 
 Vsak učni modul ima enako strukturo:
 
@@ -63,10 +69,12 @@ Zgoraj je **sledilnik napredka** (0/3 modulov), vsak modul se ob zaključku kviz
 
 ## ✨ Funkcije
 
-- **Popolnoma samostojno** — ena HTML datoteka, brez odvisnosti, brez strežnika, brez zunanjih zahtevkov (razen Google Fonts).
+- **Voden ogled (onboarding)** — ob prvem obisku pozdravni modal in spotlight tur čez vse ključne elemente; kontekstualni namigi ob interaktivni vsebini; vodenje »Naprej na naslednji korak« po vsakem kvizu. Zapomni si prek `localStorage`, znova ga zaženeš z gumbom **Ogled**.
+- **Popolnoma samostojno** — ena HTML datoteka, brez odvisnosti, brez strežnika, brez zunanjih zahtevkov (razen Google Fonts). SRC logotip je vgrajen kot data-URI (moder za svetlo, bel za temno temo).
 - **Interaktivni kviz** z ocenjevanjem, povratno informacijo in možnostjo ponovitve.
-- **Lokalna analiza medijev** — naloženi mediji se obdelajo v brskalniku in se ne pošljejo nikamor (zasebnost po zasnovi).
-- **Razvejan scenarijski trenažer** z ocenjevanjem odločitev.
+- **Lokalna analiza medijev** — EXIF + ELA v brskalniku; nič se ne pošlje nikamor (zasebnost po zasnovi).
+- **Razvejan scenarijski trenažer** (7 scenarijev) z ocenjevanjem odločitev.
+- **Nadzorna plošča pripravljenosti** in **certifikat o usposabljanju** za tisk/PDF.
 - **Sledenje napredku** in skupni rezultat.
 - **Svetla in temna tema** (samodejno po sistemu + ročni preklop).
 - **Odziven vmesnik** — deluje na namizju in mobilnih napravah.
@@ -132,12 +140,17 @@ Vse barve so definirane kot CSS spremenljivke v `:root` (in `:root[data-theme="l
 ```
 deepfake-akademija/
 ├── src/
-│   └── index.html        # celotna platforma (samostojna datoteka)
+│   ├── index.html         # celotna platforma (samostojna datoteka)
+│   └── assets/
+│       ├── src-logo.png       # SRC logo (moder)
+│       └── src-logo-white.png # SRC logo (bel, za temno temo)
 ├── docs/
 │   └── SECURITY.md        # opomba o namenu in etiki
 ├── README.md
 └── LICENSE
 ```
+
+> Opomba: `index.html` ima logotipa **vgrajena kot data-URI**, zato je datoteka samozadostna in mape `assets/` ne potrebuje za delovanje — priložena je za nadaljnjo uporabo (npr. drugje na intranetu).
 
 ---
 
